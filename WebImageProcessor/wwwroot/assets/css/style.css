@@ -1,0 +1,8 @@
+#uploadedImage {
+    max-width: 100%;
+    max-height: 400px; /* Встановіть бажану максимальну висоту */
+    display: block;
+    margin: 0 auto; /* Вирівнювання по центру */
+}
+
+

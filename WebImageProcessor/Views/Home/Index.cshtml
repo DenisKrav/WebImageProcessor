@@ -1,0 +1,62 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<!-- Опис функціоналу -->
+<div class="card">
+    <div class="card-content">
+        <div class="card-body">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-8 text-center">
+                        <h1>Ласкаво просимо до Photo Analyzer</h1>
+                        <p>
+                            Цей веб застосунок створений для обробки та аналізу ваших фотографій. Виберіть або зробіть фото,
+                            після чого натисніть кнопку опрацювати зображення і застосунок видасть інформацію по вашому зображеню.
+                        </p>
+                        <button class="btn btn-primary" id="uploadBtn">Завантажити фото</button>
+                        <button class="btn btn-success" id="captureBtn">Зробити фото</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Вікно, яке з'являться після завантаження фото -->
+@* <div class="container mt-4" id="imageContainer" style="display: none;">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h4>Ваше фото</h4>
+            <img id="uploadedImage" src="#" alt="Завантажене фото"><br />
+            <button id="sendPhotoButton" class="btn btn-primary">Опрацювати фото</button>
+        </div>
+    </div>
+</div> *@
+<div class="container mt-4" id="imageContainer" style="display: none;">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h4>Ваше фото</h4>
+            <!-- Додаємо форму для завантаження фотографії -->
+            <form asp-action="Index" asp-controller="Home" method="post" enctype="multipart/form-data">
+                <!-- Додаємо input для вибору файлу -->
+                <img id="uploadedImage" src="#" alt="Завантажене фото"><br />
+                <input type="file" id="imageFile" accept="image/*" name="image" style="display: none;" />
+                <br />
+                <!-- Кнопка для відправки фото на сервер -->
+                <button id="sendPhotoButton" class="btn btn-primary" type="submit">Опрацювати фото</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Вікно для захоплення фото за допомогою камери -->
+<div class="container mt-4" id="cameraContainer" style="display: none;">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h4>Ваша камера</h4>
+            <video id="cameraStream" autoplay></video><br />
+            <button id="takePhotoButton" class="btn btn-primary">Зробити фото</button>
+        </div>
+    </div>
+</div>

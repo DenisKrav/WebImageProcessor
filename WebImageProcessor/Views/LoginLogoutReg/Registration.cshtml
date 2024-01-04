@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "Registration Page";
+}
+@model WebImageProcessor.Models.AppUser
+
+<!--Вікно яке повідомляє про помилки-->
+@if (Context.Response.StatusCode == 409)
+{
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <!-- Вікно повідомлення про помилку -->
+                <div class="card mt-5">
+                    <div class="card-header">
+                        <h4>Error Message</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-danger">
+                            <strong>Помилка:</strong> @ViewData["RegistrationMistake"]
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h4>Реєстрація</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Форма для входу -->
+                    <form method="post" role="form" id="registrtionForm" asp-action="Registration" asp-controller="LoginLogoutReg">
+                        <div class="form-group">
+                            <label asp-for="Name">Введіть ім'я':</label>
+                            <input type="text" class="form-control" id="nameRegistrtion" name="Name" asp-for="Name" placeholder="Введіть своє ім'я" required>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Surname">Прізвище:</label>
+                            <input type="text" class="form-control" id="surnameRegistrtion" name="Surname" asp-for="Surname" placeholder="Введіть своє прізвище" required>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Nickname">Придумайте свій нікнейм:</label>
+                            <input type="text" class="form-control" id="nicknameRegistrtion" asp-for="Nickname" name="Nickname" placeholder="Придумайте нікнейм" required>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Password">Придувайте пароль:</label>
+                            <input type="text" class="form-control" id="passwordRegistrtion" asp-for="Password" name="Password" minlength="10" placeholder="Придумайте пароль, мінімум 10 символів" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary mr-2">Зареєструватися</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

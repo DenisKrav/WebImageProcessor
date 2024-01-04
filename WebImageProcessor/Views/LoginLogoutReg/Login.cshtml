@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "Login Page";
+}
+
+<!--Вікно яке повідомляє про помилки-->
+@if (Context.Response.StatusCode == 401)
+{
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <!-- Вікно повідомлення про помилку -->
+                <div class="card mt-5">
+                    <div class="card-header">
+                        <h4>Error Message</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-danger">
+                            <strong>Помилка:</strong> @ViewData["LoginMistake"]
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h4>Вхід до особистого акаунту</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Форма для входу -->
+                    <form method="post" role="form" id="loginForm">
+                        <div class="form-group">
+                            <label>Нікнейм:</label>
+                            <input type="text" class="form-control" id="nicknameLogin" name="nickname" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Пароль:</label>
+                            <input type="password" class="form-control" id="passwordLogin" name="password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary mr-2">Увійти</button>
+                    </form>
+
+                    <!-- Текст та посилання на сторінку реєстрації -->
+                    <p class="mt-3">Якщо у вас немає акаунту, то <a href="/LoginLogoutReg/Registration" class="text-primary">зареєструйтеся</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
