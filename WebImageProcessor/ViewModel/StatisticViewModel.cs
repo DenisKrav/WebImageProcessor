@@ -4,7 +4,7 @@
     {
         public int TotalNumRegUsers { get; set; }
         public int TotalNumProcesImg { get; set; }
-        public string[]? MainObjectsOnPhoto {  get; set; }
-        public string[]? MainColorsOnPhoto { get; set; }
+        public List<(string, int)>? MainObjectsOnPhoto {  get; set; }
+        public List<(string, int)>? MainColorsOnPhoto { get; set; }
     }
 }

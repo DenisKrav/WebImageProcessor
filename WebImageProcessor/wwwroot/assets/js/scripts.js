@@ -9,6 +9,7 @@
     const processedImageContainer = document.getElementById("processedImageBlock");
     const saveLink = document.getElementById("saveLink");
     const processedImg = document.getElementById("processedImg");
+    const photoInfBlock = document.getElementById("photoInfBlock");
 
     let isCameraActive = false;
     let mediaStream = null;
@@ -61,6 +62,7 @@
         });
         fileInput.click();
         processedImageContainer.style.display = "none";
+        photoInfBlock.style.display = "none";
     });
 
     captureBtn.addEventListener("click", function () {
@@ -69,6 +71,7 @@
             isCameraActive = true;
         }
         processedImageContainer.style.display = "none";
+        photoInfBlock.style.display = "none";
     });
 
     takePhotoButton.addEventListener("click", function () {
