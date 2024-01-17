@@ -1,0 +1,10 @@
+{
+  "DbConnectionString": {
+    "DefaultConnection": "Server=DENISKRAVCHENKO\\SQLEXPRESS;Database=ImageProcessorDB;Trusted_Connection=True;TrustServerCertificate=True;"
+  },
+
+  "NeuralMode": {
+    "DefaultModel": "NeuralNetworkModel/yolov8m.onnx",
+    "ClothesClassifierModel": "NeuralNetworkModel/clothesClasificationbest.onnx"
+  }
+}

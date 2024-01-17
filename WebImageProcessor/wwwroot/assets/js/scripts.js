@@ -6,6 +6,9 @@
     const takePhotoButton = document.getElementById("takePhotoButton");
     const imageContainer = document.getElementById("imageContainer");
     const uploadedImage = document.getElementById("uploadedImage");
+    const processedImageContainer = document.getElementById("processedImageBlock");
+    const saveLink = document.getElementById("saveLink");
+    const processedImg = document.getElementById("processedImg");
 
     let isCameraActive = false;
     let mediaStream = null;
@@ -42,7 +45,7 @@
         reader.readAsDataURL(file);
     }
 
-    uploadBtn.addEventListener("click", function () {
+    uploadBtn.addEventListener("click", function () {       
         const fileInput = document.createElement("input");
         fileInput.type = "file";
         fileInput.accept = "image/*";
@@ -57,6 +60,7 @@
             }
         });
         fileInput.click();
+        processedImageContainer.style.display = "none";
     });
 
     captureBtn.addEventListener("click", function () {
@@ -64,6 +68,7 @@
             startCamera();
             isCameraActive = true;
         }
+        processedImageContainer.style.display = "none";
     });
 
     takePhotoButton.addEventListener("click", function () {
@@ -95,6 +100,16 @@
                 // Зупиняємо відеопотік
                 stopCamera();
             }, "image/jpeg");
+        }
+    });
+
+    // Функція для збереження обробленого фото
+    saveLink.addEventListener("click", function () {
+        if (processedImg.src) {
+            const a = document.createElement("a");
+            a.href = processedImg.src;
+            a.download = "processed_image.png";
+            a.click();
         }
     });
 

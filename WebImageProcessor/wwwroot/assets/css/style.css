@@ -1,8 +1,20 @@
-#uploadedImage {
+#uploadedImage, #processedImg {
     max-width: 100%;
-    max-height: 400px; /* Встановіть бажану максимальну висоту */
+    max-height: 700px; /* Встановіть бажану максимальну висоту */
     display: block;
-    margin: 0 auto; /* Вирівнювання по центру */
+    margin: 20px auto; /* Вирівнювання по центру */
 }
 
+#saveLink{
+    color: white;
+}
 
+.colorListEl{
+    display: flex;
+    justify-content: space-around;
+}
+
+.colorCell {
+    width: 200px;
+    height: 25px;
+}
