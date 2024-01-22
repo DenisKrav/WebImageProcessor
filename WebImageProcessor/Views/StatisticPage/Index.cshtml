@@ -1,4 +1,148 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Statistic Page";
 }
 @model WebImageProcessor.ViewModel.StatisticViewModel
+<!--Блоки з інформацією, скільки зареєстрованих користувачів та скільки їх фото оброблено-->
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="text-center">Зареєстрованих користувачів</h4>
+            </div>
+            <div class="card-body">
+                <h1 class="text-center statNumber">@ViewBag.StatisticData.TotalNumRegUsers</h1>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="text-center">Оброблених фото</h4>
+            </div>
+            <div class="card-body">
+                <h1 class="text-center statNumber">@ViewBag.StatisticData.TotalNumProcesImg</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Javascript файл, де зберігається вся логіка та побудова діаграм знаходиться за таким шляхом: 
+    wwwroot\theme-assets\js\scripts\charts\chartjs\pie-doughnut\doughnut-simple.js-->
+
+<!-- Секція з індивідуальною статистикою користувача, який увійшов у систему -->
+<section id="generalInfPieCharts">
+    <div class="row">
+        <!-- Діаграма з об'єктами -->
+        <div class="col-md-6 col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Найбільш знаходжувані об'єкти</h4>
+                    <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i></a>
+                    <div class="heading-elements">
+                        <ul class="list-inline mb-0">
+                            <li><a data-action="collapse"><i class="ft-minus"></i></a></li>
+                            <li><a data-action="reload"><i class="ft-rotate-cw"></i></a></li>
+                            <li><a data-action="expand"><i class="ft-maximize"></i></a></li>
+                            <li><a data-action="close"><i class="ft-x"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-content collapse show">
+                    <div class="card-body">
+                        <div class="height-400">
+                            <canvas id="objDoughnutChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Діаграма з кольорами -->
+        <div class="col-md-6 col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Найбільш знаходжувані кольори</h4>
+                    <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i></a>
+                    <div class="heading-elements">
+                        <ul class="list-inline mb-0">
+                            <li><a data-action="collapse"><i class="ft-minus"></i></a></li>
+                            <li><a data-action="reload"><i class="ft-rotate-cw"></i></a></li>
+                            <li><a data-action="expand"><i class="ft-maximize"></i></a></li>
+                            <li><a data-action="close"><i class="ft-x"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-content collapse show">
+                    <div class="card-body">
+                        <div class="height-400">
+                            <canvas id="colorsDoughnutChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@if (!string.IsNullOrEmpty(Context.Request.Cookies["nickname"]))
+{
+    <!-- Секція з круговими діаграмами для статистики зареєстрованого копристувача -->
+    <section id="individualPieCharts">
+        <div class="row">
+            <!-- Діаграма з об'єктами -->
+            <div class="col-md-6 col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Ваші найбільш знаходжувані об'єкти</h4>
+                        <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i></a>
+                        <div class="heading-elements">
+                            <ul class="list-inline mb-0">
+                                <li><a data-action="collapse"><i class="ft-minus"></i></a></li>
+                                <li><a data-action="reload"><i class="ft-rotate-cw"></i></a></li>
+                                <li><a data-action="expand"><i class="ft-maximize"></i></a></li>
+                                <li><a data-action="close"><i class="ft-x"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-content collapse show">
+                        <div class="card-body">
+                            <div class="height-400">
+                                <canvas id="objUserDoughnutChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Діаграма з кольорами -->
+            <div class="col-md-6 col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Ваші найбільш знаходжувані кольори</h4>
+                        <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i></a>
+                        <div class="heading-elements">
+                            <ul class="list-inline mb-0">
+                                <li><a data-action="collapse"><i class="ft-minus"></i></a></li>
+                                <li><a data-action="reload"><i class="ft-rotate-cw"></i></a></li>
+                                <li><a data-action="expand"><i class="ft-maximize"></i></a></li>
+                                <li><a data-action="close"><i class="ft-x"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-content collapse show">
+                        <div class="card-body">
+                            <div class="height-400">
+                                <canvas id="colorsUserDoughnutChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+<script>
+    // Перетворення даних, які знаходяться у ViewBag у json формат, щоб потім ними можна було користуватися у файлі JavaScrspt
+    var jsonData = @Html.Raw(Json.Serialize(ViewBag.StatisticData));
+</script>

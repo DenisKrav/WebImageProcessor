@@ -20,39 +20,53 @@ namespace WebImageProcessor.Controllers
 
         public ActionResult Index()
         {
-            StatisticViewModel viewModel = new StatisticViewModel();
+            string nickname = HttpContext.Request.Cookies["nickname"];
 
-            viewModel.TotalNumRegUsers = db.AppUsers.Count();
-            viewModel.TotalNumProcesImg = db.UserRequests.Count();
+            var allRequests = db.UserRequests.ToList();
+            var userRequests = string.IsNullOrEmpty(nickname) ? allRequests : allRequests.Where(r => r.Nickname == nickname).ToList();
 
-            viewModel.MainColorsOnPhoto = new List<(string, int)>();
-            viewModel.MainObjectsOnPhoto = new List<(string, int)>();
 
-            // Додаємо у модель представлення усі значення кольорів та об'єктів, які були знайдені системою
-            foreach (var request in db.UserRequests)
+            var viewModel = new StatisticViewModel
             {
-                viewModel.MainColorsOnPhoto.AddRange(StringOperation.SplitStringWhithInf(request.ColorsInPhoto)
-                    .Select(color => (color, 1))); // Кожне значення починається з кількістю 1
-                viewModel.MainObjectsOnPhoto.AddRange(StringOperation.SplitStringWhithInf(request.ObjectsInPhoto)
-                    .Select(obj => (obj, 1))); // Кожне значення починається з кількістю 1
+                TotalNumRegUsers = db.AppUsers.Count(),
+                TotalNumProcesImg = allRequests.Count(),
+                MainColors = GetTopItems(allRequests.SelectMany(r => StringOperation.SplitStringWhithInf(r.ColorsInPhoto))),
+                MainColorsCount = GetTopItemsCount(allRequests.SelectMany(r => StringOperation.SplitStringWhithInf(r.ColorsInPhoto))),
+                MainObj = GetTopItems(allRequests.SelectMany(r => StringOperation.SplitStringWhithInf(r.ObjectsInPhoto))),
+                MainObjCount = GetTopItemsCount(allRequests.SelectMany(r => StringOperation.SplitStringWhithInf(r.ObjectsInPhoto))),              
+            };
+
+            if(!string.IsNullOrEmpty(nickname))
+            {
+                viewModel.MainColorsOneUser = GetTopItems(userRequests.SelectMany(r => StringOperation.SplitStringWhithInf(r.ColorsInPhoto)));
+                viewModel.MainColorsOneUserCount = GetTopItemsCount(userRequests.SelectMany(r => StringOperation.SplitStringWhithInf(r.ColorsInPhoto)));
+                viewModel.MainObjOneUser = GetTopItems(userRequests.SelectMany(r => StringOperation.SplitStringWhithInf(r.ObjectsInPhoto)));
+                viewModel.MainObjOneUserCount = GetTopItemsCount(userRequests.SelectMany(r => StringOperation.SplitStringWhithInf(r.ObjectsInPhoto)));
             }
 
-            // Групування елементів за кількістю, за спаданням, та вибір 5 перших елементів та їх значення кількості
-            viewModel.MainColorsOnPhoto = viewModel.MainColorsOnPhoto
-                .GroupBy(item => item.Item1)
-                .Select(group => (group.Key, group.Sum(item => item.Item2)))
-                .OrderByDescending(group => group.Item2)
+            ViewBag.StatisticData = viewModel;
+
+            return View();
+        }
+
+        private List<string> GetTopItems(IEnumerable<string> items)
+        {
+            return items
+                .GroupBy(item => item)
+                .Select(group => group.Key)
+                .OrderByDescending(group => group.Count())
                 .Take(5)
                 .ToList();
+        }
 
-            viewModel.MainObjectsOnPhoto = viewModel.MainObjectsOnPhoto
-                .GroupBy(item => item.Item1)
-                .Select(group => (group.Key, group.Sum(item => item.Item2)))
-                .OrderByDescending(group => group.Item2)
+        private List<int> GetTopItemsCount(IEnumerable<string> items)
+        {
+            return items
+                .GroupBy(item => item)
+                .Select(group => group.Count())
+                .OrderByDescending(count => count)
                 .Take(5)
                 .ToList();
-
-            return View(viewModel);
-        }       
+        }
     }
 }

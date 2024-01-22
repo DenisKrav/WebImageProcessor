@@ -14,6 +14,27 @@
     let isCameraActive = false;
     let mediaStream = null;
 
+
+    // Функції для занесення поточного адресу сторінки у кукі файли до натискання на кнопку реєстрації чи входу
+    // після натискання кукі буде дійсна 7 днів
+    var buttons = document.getElementsByClassName('regBtn');
+
+    function setCookie(name, value, days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener('click', function () {
+            setCookie('lastVisitedURL', window.location.href, 7);
+        });
+    }
+
     // Функція для відображення відеопотоку з камери
     function startCamera() {
         navigator.mediaDevices.getUserMedia({ video: true })
@@ -115,24 +136,4 @@
             a.click();
         }
     });
-
-    // Функції для занесення поточного адресу сторінки у кукі файли до натискання на кнопку реєстрації чи входу
-    // після натискання кукі буде дійсна 7 днів
-    var buttons = document.getElementsByClassName('regBtn');
-
-    function setCookie(name, value, days) {
-        var expires = "";
-        if (days) {
-            var date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            expires = "; expires=" + date.toUTCString();
-        }
-        document.cookie = name + "=" + (value || "") + expires + "; path=/";
-    }
-
-    for (var i = 0; i < buttons.length; i++) {
-        buttons[i].addEventListener('click', function () {
-            setCookie('lastVisitedURL', window.location.href, 7);
-        });
-    }
 });

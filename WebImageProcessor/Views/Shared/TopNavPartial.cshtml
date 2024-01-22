@@ -19,21 +19,21 @@
                             <div class="arrow_box_right">
                                 @if (Context.Request.Cookies.ContainsKey("nickname") && !String.IsNullOrEmpty(Context.Request.Cookies["nickname"]))
                                 {
-                                    <a class="dropdown-item" href="/LoginLogoutReg/Logout"><i class="ft-user regBtn"></i><span class="user-name text-bold-700 ml-1">@Context.Request.Cookies["nickname"]</span></a>
+                                    <a class="dropdown-item regBtn" href="/LoginLogoutReg/Logout"><i class="ft-user "></i><span class="user-name text-bold-700 ml-1">@Context.Request.Cookies["nickname"]</span></a>
                                 }
                                 else
                                 {
-                                    <a class="dropdown-item" href="/LoginLogoutReg/Login"><i class="ft-user regBtn"></i><span class="user-name text-bold-700 ml-1">Користувач</span></a>
+                                    <a class="dropdown-item regBtn" href="/LoginLogoutReg/Login"><i class="ft-user"></i><span class="user-name text-bold-700 ml-1">Користувач</span></a>
 
                                 }
                                 <div class="dropdown-divider"></div>
                                 @if (Context.Request.Cookies.ContainsKey("nickname") && !String.IsNullOrEmpty(Context.Request.Cookies["nickname"]))
                                 {
-                                    <a class="dropdown-item" href="/LoginLogoutReg/Logout"><i class="ft-power regBtn"></i>Вийти</a>
+                                    <a class="dropdown-item regBtn" href="/LoginLogoutReg/Logout"><i class="ft-power"></i>Вийти</a>
                                 }
                                 else
                                 {
-                                    <a class="dropdown-item" href="/LoginLogoutReg/Login"><i class="ft-power regBtn"></i>Вхід/Реєстрація</a>
+                                    <a class="dropdown-item regBtn" href="/LoginLogoutReg/Login"><i class="ft-power"></i>Вхід/Реєстрація</a>
                                 }
                             </div>
                         </div>

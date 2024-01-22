@@ -10,38 +10,50 @@
 
 // Doughnut chart
 // ------------------------------
-$(window).on("load", function(){
+$(window).on("load", function () {
+    // Діаграми для загальної статистики
+    createDoughnutChart("#colorsDoughnutChart", jsonData.mainColors, jsonData.mainColorsCount, "Найбільш знаходжувані кольори", true);
+    createDoughnutChart("#objDoughnutChart", jsonData.mainObj, jsonData.mainObjCount, "Найбільш знаходжувані об'єкти", false);
 
-    //Get the context of the Chart canvas element we want to select
-    var ctx = $("#simple-doughnut-chart");
+    // Діаграми для статистики зареєстрованого користувача
+    if (jsonData.mainColorsOneUser && jsonData.mainObjOneUser) {
+        createDoughnutChart("#colorsUserDoughnutChart", jsonData.mainColorsOneUser, jsonData.mainColorsOneUserCount, "Ваші найбільш знаходжувані кольори", true);
+        createDoughnutChart("#objUserDoughnutChart", jsonData.mainObjOneUser, jsonData.mainObjOneUserCount, "Ваші найбільш знаходжувані об'єкти", false);
+    }
+});
 
-    // Chart Options
-    var chartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        responsiveAnimationDuration:500,
-    };
+function createDoughnutChart(ctxSelector, labels, data, label, backgroundAvailable) {
+    var ctx = $(ctxSelector);
+    if (backgroundAvailable) {
+        backgroundColors = labels.map(color => '#' + color);
 
-    // Chart Data
+    }
+    else {
+        backgroundColors = ['#9FBDBE', '#DAC8AE', '#CE8999', '#968F56', '#E3CA86']
+    }
+
     var chartData = {
-        labels: ["January", "February", "March", "April", "May"],
+        labels: labels,
         datasets: [{
-            label: "My First dataset",
-            data: [65, 35, 24, 45, 85],
-            backgroundColor: ['#666EE8', '#28D094', '#FF4961','#1E9FF2', '#FF9149'],
+            label: label,
+            data: data,
+            backgroundColor: backgroundColors,
         }]
     };
 
     var config = {
         type: 'doughnut',
-
-        // Chart Options
-        options : chartOptions,
-
-        data : chartData
+        options: getChartOptions(),
+        data: chartData
     };
 
-    // Create the chart
-    var doughnutSimpleChart = new Chart(ctx, config);
+    new Chart(ctx, config);
+}
 
-});
+function getChartOptions() {
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        responsiveAnimationDuration: 500,
+    };
+}
