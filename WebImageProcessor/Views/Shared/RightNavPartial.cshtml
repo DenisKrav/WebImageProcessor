@@ -1,4 +1,15 @@
-﻿<div class="main-menu menu-fixed menu-light menu-accordion    menu-shadow " data-scroll-to-active="true" data-img="theme-assets/images/backgrounds/02.jpg">
+﻿@using WebImageProcessor.ViewModel.Models
+@{
+    var menuItems = new List<MenuItemModel>
+    {
+        new MenuItemModel("Home Page", "ft-home", "Головна", "/Home/Index"),
+        new MenuItemModel("Statistic Page", "ft-pie-chart", "Статистика", "/StatisticPage/Index"),
+        new MenuItemModel("Documentation Page", "ft-book", "Про проект", "/DocumentationPage/Index"),
+    };
+}
+
+
+<div class="main-menu menu-fixed menu-light menu-accordion    menu-shadow " data-scroll-to-active="true" data-img="theme-assets/images/backgrounds/02.jpg">
 
     <!-- Блок з назвою -->
     <div class="navbar-header">
@@ -15,15 +26,12 @@
     <!-- Кнопки навігіції -->
     <div class="main-menu-content">
         <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
-            <li class="nav-item">
-                <a href="/Home/Index"><i class="ft-home"></i><span class="menu-title" data-i18n="">Головна</span></a>
-            </li>
-            <li class="nav-item">
-                <a href="/StatisticPage/Index"><i class="ft-pie-chart"></i><span class="menu-title" data-i18n="">Статистика</span></a>
-            </li>
-            <li class="nav-item">
-                <a href="/DocumentationPage/Index"><i class="ft-book"></i><span class="menu-title" data-i18n="">Про проект</span></a>
-            </li>
+            @foreach (var item in menuItems)
+            {
+                <li class="@(ViewData["Title"] == item.Title ? "active" : "nav-item")">
+                    <a href="@item.Url"><i class="@item.IconClass"></i><span class="menu-title" data-i18n="">@item.MenuTitle</span></a>
+                </li>
+            }
         </ul>
     </div>
 

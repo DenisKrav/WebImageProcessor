@@ -35,6 +35,34 @@
         });
     }
 
+    // Функція для анмації числа на сторінці статистики
+    $(document).ready(function () {
+        // Знаходимо всі елементи з класом 'statNumber'
+        $('.statNumber').each(function () {
+            // Отримуємо цільове значення з атрибута 'data-target-value'
+            var targetValue = parseInt($(this).data('target-value'));
+
+            // Стартове значення
+            var currentValue = 0;
+
+            // Встановлюємо інтервал для збільшення числа
+            var interval = setInterval(function () {
+                // Змінюємо текст елементу на поточне значення
+                $(this).text(currentValue);
+
+                // Збільшуємо поточне значення
+                currentValue++;
+
+                // Перевіряємо, чи досягли максимального значення
+                if (currentValue > targetValue) {
+                    // Зупиняємо інтервал, якщо досягли максимального значення
+                    clearInterval(interval);
+                }
+                // Задаємо інтервал на 50 мілісекунд
+            }.bind(this), 50);
+        });
+    });
+
     // Функція для передачі нікнейму з таблиці у модальне вікно, які розташовані на сторінці адміна
     $('.delete-user-btn').on('click', function () {
         var nickname = $(this).data('nickname');

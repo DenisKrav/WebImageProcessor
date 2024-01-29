@@ -1,4 +1,7 @@
-﻿@model WebImageProcessor.ViewModel.AdminPageViewModel
+﻿@{
+	ViewData["Title"] = "Admin Page";
+}
+@model WebImageProcessor.ViewModel.AdminPageViewModel
 
 <!--Вікно яке повідомляє про помилки-->
 @if (Context.Response.StatusCode == 401)

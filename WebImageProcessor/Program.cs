@@ -24,8 +24,6 @@ namespace WebImageProcessor
             builder.Services.AddScoped<IDetectObject, YoloV8ProcessImgService>();
             builder.Services.AddScoped<IPhotoInformation, PhotoInfYoloV8Service>();
 
-
-            /////////////////////////////////////////////////////
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
@@ -33,7 +31,6 @@ namespace WebImageProcessor
                     options.AccessDeniedPath = "/Home/Index";
                 });
             builder.Services.AddAuthorization();
-            /////////////////////////////////////////////////////
 
             var app = builder.Build();
 
