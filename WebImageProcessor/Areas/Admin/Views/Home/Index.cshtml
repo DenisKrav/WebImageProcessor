@@ -1,0 +1,101 @@
+﻿@model WebImageProcessor.ViewModel.AdminPageViewModel
+
+<!--Вікно яке повідомляє про помилки-->
+@if (Context.Response.StatusCode == 401)
+{
+	<div class="container">
+		<div class="row justify-content-center">
+			<div class="col-md-6">
+				<!-- Вікно повідомлення про помилку -->
+				<div class="card mt-5">
+					<div class="card-header">
+						<h4>Error Message</h4>
+					</div>
+					<div class="card-body">
+						<div class="alert alert-danger">
+							<strong>Помилка:</strong> @ViewData["AdminMistake"]
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+<div class="modal fade" id="confirm-delete-user" tabindex="-1" role="dialog" aria-labelledby="confirm-delete-user-label" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="confirm-delete-user-label">Підтвердження видалення користувача</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Закрити">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				Ви впевнені, що хочете видалити користувача <strong></strong>?
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Скасувати</button>
+				<form asp-area="Admin" asp-controller="Home" asp-action="DeleteUser" method="post" id="confirm-delete-user-form">
+					<input type="hidden" name="nickname" id="delete-user-nickname" />
+					<button class="btn btn-danger" type="submit">видалити</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="row">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-header">
+				<h4 class="card-title">Редагування користувачів</h4>
+			</div>
+			<div class="card-content collapse show">
+				<div class="table-responsive">
+					<table class="table">
+						<thead class="thead-dark">
+							<tr>
+								<th scope="col">Nickname</th>
+								<th scope="col">Ім'я</th>
+								<th scope="col">Призвіще</th>
+								<th scope="col">Пароль</th>
+								<th scope="col">Роль</th>
+								<th scope="col">Змінити роль</th>
+								<th scope="col">Видалити</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach(var user in Model.FullUsersInf)
+							{
+								<tr>
+									<th>@user.Nickname</th>
+									<th>@user.Name</th>
+									<th>@user.Surname</th>
+									<th>@user.Password</th>
+									<th>@user.RoleName</th>
+									<th>
+										<form asp-area="Admin" asp-controller="Home" asp-action="ChangeRole" method="post" asp-route-nickname="@user.Nickname">
+											@if(user.RoleName == "user")
+											{
+												<input class="btn btn-info adminTableBtn" type="submit" value="на admin" />
+											}
+											else
+											{
+												<input class="btn btn-info adminTableBtn" type="submit" value="на user" />
+											}
+										</form>
+									</th>
+									<th>
+										<button class="btn btn-info adminTableBtn delete-user-btn" data-toggle="modal" data-target="#confirm-delete-user" data-nickname="@user.Nickname">видалити</button>
+									</th>
+								</tr>
+							}							
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

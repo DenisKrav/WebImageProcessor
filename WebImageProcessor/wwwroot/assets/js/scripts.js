@@ -35,6 +35,13 @@
         });
     }
 
+    // Функція для передачі нікнейму з таблиці у модальне вікно, які розташовані на сторінці адміна
+    $('.delete-user-btn').on('click', function () {
+        var nickname = $(this).data('nickname');
+        $('#confirm-delete-user').find('.modal-body strong').text(nickname);
+        $('#delete-user-nickname').val(nickname);
+    });
+
     // Функція для відображення відеопотоку з камери
     function startCamera() {
         navigator.mediaDevices.getUserMedia({ video: true })

@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using WebImageProcessor.Models;
 using WebImageProcessor.Services.Image_process.Interfeces;
@@ -21,6 +24,17 @@ namespace WebImageProcessor
             builder.Services.AddScoped<IDetectObject, YoloV8ProcessImgService>();
             builder.Services.AddScoped<IPhotoInformation, PhotoInfYoloV8Service>();
 
+
+            /////////////////////////////////////////////////////
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/LoginLogoutReg/Login";
+                    options.AccessDeniedPath = "/Home/Index";
+                });
+            builder.Services.AddAuthorization();
+            /////////////////////////////////////////////////////
+
             var app = builder.Build();
 
             app.UseHttpsRedirection();
@@ -28,8 +42,12 @@ namespace WebImageProcessor
 
             app.UseRouting();
 
-            app.UseAuthorization();
+			app.UseCookiePolicy();
+			app.UseAuthorization();
 
+            app.MapControllerRoute(
+                name: "admin",
+                pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");

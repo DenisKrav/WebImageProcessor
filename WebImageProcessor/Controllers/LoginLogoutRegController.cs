@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Security.Claims;
 using WebImageProcessor.Models;
 
 namespace WebImageProcessor.Controllers
@@ -25,7 +28,7 @@ namespace WebImageProcessor.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(string password, string nickname)
+        public IActionResult LoginAsync(string password, string nickname)
         {
             if (db.AppUsers.Any(b => b.Password == password && b.Nickname == nickname))
             {
@@ -34,6 +37,12 @@ namespace WebImageProcessor.Controllers
                 if (user.Password == password)
                 {
                     HttpContext.Response.Cookies.Append("nickname", user.Nickname.ToString());
+
+                    UserRole userRole = db.UserRoles.Where(r => r.RoleId == user.RoleId).FirstOrDefault();
+
+                    // Занесення даних про користувача в систему, для подальшого використання у праві доступа до деяких функцій
+                    SetUserInSystem(nickname, userRole.RoleName);
+
                     return RedirectUser(HttpContext.Request.Cookies["lastVisitedURL"]);
                 }
                 else
@@ -79,14 +88,18 @@ namespace WebImageProcessor.Controllers
                 db.AppUsers.Add(user);
                 await db.SaveChangesAsync();
 
+                SetUserInSystem(user.Nickname, "user");
+
                 HttpContext.Response.Cookies.Append("nickname", user.Nickname.ToString());
             }
 
             return RedirectUser(HttpContext.Request.Cookies["lastVisitedURL"]);
         }
 
-        public IActionResult LogOut()
+        public async Task<IActionResult> LogOutAsync()
         {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
             if (string.IsNullOrEmpty(HttpContext.Request.Cookies["nickname"]))
             {
                 return RedirectUser(HttpContext.Request.Cookies["lastVisitedURL"]);
@@ -110,6 +123,20 @@ namespace WebImageProcessor.Controllers
             {
                 return Redirect(link);
             }
+        }
+
+        // Метод для занесення даних про користувача у систему
+        private async void SetUserInSystem(string nickname, string userRole)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimsIdentity.DefaultNameClaimType, nickname),
+                new Claim(ClaimsIdentity.DefaultRoleClaimType, userRole)
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, "Cookies");
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+            await HttpContext.SignInAsync(claimsPrincipal);
         }
     }
 }
