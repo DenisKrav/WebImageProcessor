@@ -9,7 +9,6 @@ namespace WebImageProcessor.Controllers
     public class StatisticPageController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IConfiguration _appConfig;
         private readonly ImageProcessorDbContext db;
 
         public StatisticPageController(ILogger<HomeController> logger, ImageProcessorDbContext context) 
@@ -20,7 +19,7 @@ namespace WebImageProcessor.Controllers
 
         public ActionResult Index()
         {
-            string nickname = HttpContext.Request.Cookies["nickname"];
+            string? nickname = HttpContext.Request.Cookies["nickname"];
 
             var allRequests = db.UserRequests.ToList();
             var userRequests = string.IsNullOrEmpty(nickname) ? allRequests : allRequests.Where(r => r.Nickname == nickname).ToList();

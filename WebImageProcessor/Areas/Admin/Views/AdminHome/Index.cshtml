@@ -39,7 +39,7 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-dismiss="modal">Скасувати</button>
-				<form asp-area="Admin" asp-controller="Home" asp-action="DeleteUser" method="post" id="confirm-delete-user-form">
+				<form asp-area="Admin" asp-controller="AdminHome" asp-action="DeleteUser" method="post" id="confirm-delete-user-form">
 					<input type="hidden" name="nickname" id="delete-user-nickname" />
 					<button class="btn btn-danger" type="submit">видалити</button>
 				</form>
@@ -79,7 +79,7 @@
 									<th>@user.Password</th>
 									<th>@user.RoleName</th>
 									<th>
-										<form asp-area="Admin" asp-controller="Home" asp-action="ChangeRole" method="post" asp-route-nickname="@user.Nickname">
+										<form asp-area="Admin" asp-controller="AdminHome" asp-action="ChangeRole" method="post" asp-route-nickname="@user.Nickname">
 											@if(user.RoleName == "user")
 											{
 												<input class="btn btn-info adminTableBtn" type="submit" value="на admin" />

@@ -37,14 +37,8 @@ namespace WebImageProcessor.Services.Image_process.Realization
 
         public static string GetModelPath(IConfiguration appConfig)
         {
-            if (string.IsNullOrEmpty(appConfig["NeuralMode:ClothesClassifierModel"]))
-            {
-                return appConfig["NeuralMode:DefaultModel"];
-            }
-            else
-            {
-                return appConfig["NeuralMode:ClothesClassifierModel"];
-            }
-        }
+            return string.IsNullOrEmpty(appConfig["NeuralMode:ClothesClassifierModel"]) ? 
+                appConfig["NeuralMode:DefaultModel"] : appConfig["NeuralMode:ClothesClassifierModel"];
+		}
     }
 }

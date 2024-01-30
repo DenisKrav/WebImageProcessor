@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebImageProcessor.Controllers;
 using WebImageProcessor.Models;
 using WebImageProcessor.ViewModel;
 using WebImageProcessor.ViewModel.Models;
@@ -8,11 +9,11 @@ using WebImageProcessor.ViewModel.Models;
 namespace WebImageProcessor.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class HomeController : Controller
+    public class AdminHomeController : BaseController
     {
         private readonly ImageProcessorDbContext db;
 
-        public HomeController(ImageProcessorDbContext context) 
+        public AdminHomeController(ImageProcessorDbContext context) 
         {
             db = context;
         }
@@ -49,8 +50,8 @@ namespace WebImageProcessor.Areas.Admin.Controllers
 
 				if (userRoleName == null)
 				{
-					RegProblem(401, "Не знайдена роль користувача.");
-					return RedirectToAction("Index", "Home", new { area = "Admin" });
+					RegProblem(401, "AdminMistake", "Не знайдена роль користувача.");
+					return RedirectUser("/Admin/AdminHome/Index");
 				}
 
 				int userRoleId = db.UserRoles
@@ -68,8 +69,9 @@ namespace WebImageProcessor.Areas.Admin.Controllers
 				db.AppUsers.Update(user);
 				await db.SaveChangesAsync();
 
-				return RedirectToAction("Index", "Home", new { area = "Admin" });
-			});
+				return RedirectUser("/Admin/AdminHome/Index");
+
+            });
 		}
 
 		[Authorize(Roles = "admin")]
@@ -81,7 +83,7 @@ namespace WebImageProcessor.Areas.Admin.Controllers
 				db.AppUsers.Remove(user);
 				await db.SaveChangesAsync();
 
-				return RedirectToAction("Index", "Home", new { area = "Admin" });
+				return RedirectUser("/Admin/AdminHome/Index");
 			});
 		}
 
@@ -89,16 +91,16 @@ namespace WebImageProcessor.Areas.Admin.Controllers
 		{
 			if (string.IsNullOrWhiteSpace(nickname))
 			{
-				RegProblem(401, "Некоректний нікнейм.");
-				return RedirectToAction("Index", "Home", new { area = "Admin" });
+				RegProblem(401, "AdminMistake", "Некоректний нікнейм.");
+				return RedirectUser("/Admin/AdminHome/Index");
 			}
 
 			AppUser? user = db.AppUsers.FirstOrDefault(x => x.Nickname == nickname);
 
 			if (user == null)
 			{
-				RegProblem(401, "Користувач не знайдений.");
-				return RedirectToAction("Index", "Home", new { area = "Admin" });
+				RegProblem(401, "AdminMistake", "Користувач не знайдений.");
+				return RedirectUser("/Admin/AdminHome/Index");
 			}
 
 			return await action(user);
@@ -107,12 +109,6 @@ namespace WebImageProcessor.Areas.Admin.Controllers
 		private bool CheckAdminRole(string roleName)
         {
             return roleName.ToLower() == "admin";
-		}
-
-		public void RegProblem(int statucCode,  string problem)
-        {
-			HttpContext.Response.StatusCode = statucCode;
-			ViewData["AdminMistake"] = problem;
 		}
     }
 }

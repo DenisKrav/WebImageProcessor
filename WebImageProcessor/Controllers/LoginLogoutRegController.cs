@@ -4,16 +4,17 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Security.Claims;
+using WebImageProcessor.Areas.Admin.Controllers;
 using WebImageProcessor.Models;
 
 namespace WebImageProcessor.Controllers
 {
     //Подумати про реєстрацію та аунтефікацію за допомогою jwt токенів
 
-    public class LoginLogoutRegController : Controller
+    public class LoginLogoutRegController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
-        ImageProcessorDbContext db;
+        private readonly ImageProcessorDbContext db;
 
         public LoginLogoutRegController(ILogger<HomeController> logger, ImageProcessorDbContext context)
         {
@@ -28,38 +29,37 @@ namespace WebImageProcessor.Controllers
         }
 
         [HttpPost]
-        public IActionResult LoginAsync(string password, string nickname)
+        public IActionResult LoginAsync(string? password, string? nickname)
         {
-            if (db.AppUsers.Any(b => b.Password == password && b.Nickname == nickname))
+            if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(nickname))
             {
-                AppUser user = db.AppUsers.FirstOrDefault(b => b.Password == password && b.Nickname == nickname);
-
-                if (user.Password == password)
-                {
-                    HttpContext.Response.Cookies.Append("nickname", user.Nickname.ToString());
-
-                    UserRole userRole = db.UserRoles.Where(r => r.RoleId == user.RoleId).FirstOrDefault();
-
-                    // Занесення даних про користувача в систему, для подальшого використання у праві доступа до деяких функцій
-                    SetUserInSystem(nickname, userRole.RoleName);
-
-                    return RedirectUser(HttpContext.Request.Cookies["lastVisitedURL"]);
-                }
-                else
-                {
-                    HttpContext.Response.StatusCode = 401;
-                    ViewData["LoginMistake"] = "Невірно введений пароль.";
-
-                    return View();
-                }
-            }
-            else
-            {
-                HttpContext.Response.StatusCode = 401;
-                ViewData["LoginMistake"] = "Користвача з таким нікнеймом не існує.";
-
+                RegProblem(401, "LoginMistake", "Не вказаний нікнейм чи пароль.");
                 return View();
             }
+
+            AppUser? user = db.AppUsers.FirstOrDefault(b => b.Password == password && b.Nickname == nickname);
+
+            if (user == null)
+            {
+                RegProblem(401, "LoginMistake", "Користвача з таким нікнеймом не існує.");
+                return View();
+            }
+
+            if (user.Password != password)
+            {
+                RegProblem(401, "LoginMistake", "Невірно введений пароль.");
+                return View();
+            }
+
+            HttpContext.Response.Cookies.Append("nickname", user.Nickname.ToString());
+
+            // Знаходимо роль користувача, якщо її не знайдено, то встановлюємо за замовчуванням "user"
+            string userRoleName = db.UserRoles.Where(r => r.RoleId == user.RoleId).FirstOrDefault().RoleName ?? "user";
+
+            // Занесення даних про користувача в систему, для подальшого використання у праві доступа до деяких функцій
+            SetUserInSystem(user.Nickname, userRoleName);
+
+            return RedirectUser(HttpContext.Request.Cookies["lastVisitedURL"]);
         }
 
         [HttpGet]
@@ -76,9 +76,7 @@ namespace WebImageProcessor.Controllers
 
             if (db.AppUsers.Any(b => b.Nickname == user.Nickname))
             {
-                HttpContext.Response.StatusCode = 409;
-
-                ViewData["RegistrationMistake"] = "Користувач з таким ніком вже існує.";
+                RegProblem(409, "RegistrationMistake", "Користувач з таким ніком вже існує.");
 
                 return View();
             }
@@ -109,19 +107,6 @@ namespace WebImageProcessor.Controllers
                 HttpContext.Response.Cookies.Delete("nickname");
 
                 return RedirectUser("");
-            }
-        }
-
-        private IActionResult RedirectUser(string link)
-        {
-            // Переадресація користувача но сторінку з якої він перейшов на сторінку реєстрації
-            if (string.IsNullOrEmpty(link))
-            {
-                return RedirectToAction("Index", "Home");
-            }
-            else
-            {
-                return Redirect(link);
             }
         }
 
