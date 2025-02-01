@@ -4,13 +4,23 @@ using SixLabors.ImageSharp;
 using System.Drawing;
 using WebImageProcessor.Services.Image_process.Interfeces;
 using Compunet.YoloV8.Data;
+using WebImageProcessor.Tools;
 
 namespace WebImageProcessor.Services.Image_process.Realization
 {
     public class PhotoInfYoloV8Service : IPhotoInformation
     {
-        // Головний метод для знаходження середніх значнь кольорів в усіх боксах
-        public async Task<(string, string)> AnalysePhotoAsync(IFormFile file, IConfiguration appConfig)
+		/// <summary>
+		/// Мето AnalysePhotoAsync аналізує які є обьєкти на фото і також визначає кольори у боксах. Головний принцип роботи 
+        /// розпізнавання кольорів - перетворення зображення на більш піксельне, після чого воно квантонується (прибираються 
+        /// напівтони), і тільки потім аналізуються кольори і вибираються найбільш зустрічаємі
+		/// </summary>
+		/// <param name="file"></param>
+		/// <param name="appConfig"></param>
+		/// <returns></returns>
+
+		// Головний метод для знаходження середніх значнь кольорів в усіх боксах
+		public async Task<(string, string)> AnalysePhotoAsync(IFormFile file, IConfiguration appConfig)
         {
             using (var stream = file.OpenReadStream())
             {
@@ -51,7 +61,7 @@ namespace WebImageProcessor.Services.Image_process.Realization
                     int y = detectionResult.Boxes[i].Bounds.Y;
                     int width = detectionResult.Boxes[i].Bounds.Width;
                     int height = detectionResult.Boxes[i].Bounds.Height;
-                    result += "|" + ConvertRGBToHEX(GetAvgColorInBox(bitmap, x, y, width, height));
+                    result += GetMainColors(ImageQuantization.QuantizeImage(ConvertImageToPixel(bitmap), 16), x, y, width, height);
                 }
 
                 return result;
@@ -59,38 +69,98 @@ namespace WebImageProcessor.Services.Image_process.Realization
 
         }
 
-        // Метод для от римання середнього значення кольору у боксі з одягом
-        static System.Drawing.Color GetAvgColorInBox(Bitmap bitmap, int startX, int startY, int width, int height)
-        {
-            // Змінні для сумарних значень кольорів
-            int totalR = 0, totalG = 0, totalB = 0;
+		//// Метод для отримання середнього значення кольору у боксі з одягом
+		//static System.Drawing.Color GetAvgColorInBox(Bitmap bitmap, int startX, int startY, int width, int height)
+		//{
+		//    // Змінні для сумарних значень кольорів
+		//    int totalR = 0, totalG = 0, totalB = 0;
 
-            // Перебір пікселів у вказаному квадраті
-            for (int x = startX; x < startX + width; x++)
+		//    // Перебір пікселів у вказаному квадраті
+		//    for (int x = startX; x < startX + width; x++)
+		//    {
+		//        for (int y = startY; y < startY + height; y++)
+		//        {
+		//            // Отримання кольору пікселя
+		//            System.Drawing.Color pixelColor = bitmap.GetPixel(x, y);
+
+		//            // Додавання кольорів для подальшого обрахунку середнього
+		//            totalR += pixelColor.R;
+		//            totalG += pixelColor.G;
+		//            totalB += pixelColor.B;
+		//        }
+		//    }
+
+		//    // Обчислення середнього кольору
+		//    int averageR = totalR / (width * height);
+		//    int averageG = totalG / (width * height);
+		//    int averageB = totalB / (width * height);
+
+		//    // Створення та повернення середнього кольору
+		//    return System.Drawing.Color.FromArgb(averageR, averageG, averageB);
+		//}
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		public static string GetMainColors(Bitmap bitmap, int startX, int startY, int width, int height)
+		{
+			List<string> colors = new List<string>();
+            string result = "";
+
+			// Перебір пікселів у вказаному квадраті
+			for (int x = startX; x < startX + width; x++)
+			{
+				for (int y = startY; y < startY + height; y++)
+				{
+					// Отримання кольору пікселя
+					System.Drawing.Color pixelColor = bitmap.GetPixel(x, y);
+
+					// Додавання кольорів для подальшого обрахунку середнього
+					colors.Add(ConvertRGBToHEX(pixelColor));
+				}
+			}
+
+			// Групування та сортування кольорів за кількістю
+			var groupedColors = colors
+				.GroupBy(c => c)
+				.OrderByDescending(group => group.Count())
+				.Select(group => group.Key)
+				.Take(10)
+				.ToList();
+
+            foreach (var c in groupedColors)
             {
-                for (int y = startY; y < startY + height; y++)
-                {
-                    // Отримання кольору пікселя
-                    System.Drawing.Color pixelColor = bitmap.GetPixel(x, y);
-
-                    // Додавання кольорів для подальшого обрахунку середнього
-                    totalR += pixelColor.R;
-                    totalG += pixelColor.G;
-                    totalB += pixelColor.B;
-                }
+                result += "|" + c;
             }
 
-            // Обчислення середнього кольору
-            int averageR = totalR / (width * height);
-            int averageG = totalG / (width * height);
-            int averageB = totalB / (width * height);
+			return result;
+		}
 
-            // Створення та повернення середнього кольору
-            return System.Drawing.Color.FromArgb(averageR, averageG, averageB);
-        }
+		public static Bitmap ConvertImageToPixel(Bitmap source)
+		{
+			int H_CELL = 100;
+			int W_CELL = 100;
 
-        // Пертворення System.Drawing.Color у Bitmap
-        public static Bitmap ConvertImageSLToBitmap(SixLabors.ImageSharp.Image image)
+			Bitmap result = new Bitmap(source);
+			Bitmap bitmap = new Bitmap(source);
+
+			using (Graphics g = Graphics.FromImage(result))
+			{
+				for (int y = 0; y < bitmap.Height; y += H_CELL)
+				{
+					for (int x = 0; x < bitmap.Width; x += W_CELL)
+					{
+						Brush brush = new SolidBrush(bitmap.GetPixel(x, y));
+						g.FillRectangle(brush, x, y, W_CELL, H_CELL);
+					}
+				}
+			}
+
+			return result;
+		}
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		// Пертворення System.Drawing.Color у Bitmap
+		public static Bitmap ConvertImageSLToBitmap(SixLabors.ImageSharp.Image image)
         {
             // Створення пустого MemoryStream
             using (MemoryStream memoryStream = new MemoryStream())
